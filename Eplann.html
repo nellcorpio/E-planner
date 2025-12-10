@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Eplann</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Roboto for main text, Google Sans (approximated by Open Sans) for headers -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background-color: #f0f2f5; /* Google light grey background */
+            color: #202124;
+            /* Increased padding to prevent content being covered by the minimized footer */
+            padding-bottom: 120px; 
+        }
+        h1, h2, h3, .brand-font { font-family: 'Open Sans', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Material Input Styles */
+        .input-group { position: relative; margin-bottom: 0.5rem; }
+        .material-input {
+            width: 100%;
+            background-color: #f1f3f4;
+            border: none;
+            border-bottom: 2px solid transparent;
+            border-radius: 8px 8px 0 0;
+            padding: 24px 16px 8px 16px;
+            font-size: 16px;
+            color: #202124;
+            transition: all 0.2s;
+            outline: none;
+            /* Ensure fixed height for alignment with buttons */
+            height: 50px; 
+            box-sizing: border-box;
+        }
+        .material-input:focus {
+            background-color: #e8f0fe;
+            border-bottom-color: #1a73e8;
+        }
+        .material-input:focus ~ .input-label,
+        .material-input:not(:placeholder-shown) ~ .input-label {
+            top: 6px;
+            font-size: 12px;
+            color: #1a73e8;
+            font-weight: 500;
+        }
+        /* Fix for date/time inputs which always have value */
+        input[type="date"] ~ .input-label,
+        input[type="time"] ~ .input-label,
+        select.material-input ~ .input-label {
+            top: 6px;
+            font-size: 12px;
+            color: #5f6368;
+        }
+        input[type="date"]:focus ~ .input-label,
+        input[type="time"]:focus ~ .input-label,
+        select.material-input:focus ~ .input-label {
+            color: #1a73e8;
+        }
+        .input-label {
+             position: absolute;
+             top: 17px; /* Adjusted initial position */
+             left: 16px;
+             color: #5f6368;
+             pointer-events: none;
+             transition: all 0.2s;
+             font-size: 16px;
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            margin-bottom: 16px;
+            transition: box-shadow 0.3s;
+        }
+        .card:hover { box-shadow: 0 4px 6px rgba(0,0,0,0.12), 0 4px 4px rgba(0,0,0,0.24); }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: #1a73e8;
+            color: white;
+            border-radius: 20px;
+            padding: 10px 24px;
+            font-weight: 500;
+            letter-spacing: 0.25px;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            height: 50px; /* Fixed height for alignment */
+        }
+        .btn-primary:hover { background-color: #1557b0; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .btn-primary:active { background-color: #174ea6; }
+        
+        .btn-secondary {
+            background-color: #e8f0fe;
+            color: #1a73e8;
+            border-radius: 20px;
+            padding: 10px 24px;
+            font-weight: 500;
+            letter-spacing: 0.25px;
+            transition: background-color 0.2s;
+            height: 50px;
+        }
+        .btn-secondary:hover { background-color: #d2e3fc; }
+
+        .btn-icon {
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        .btn-icon:hover { background-color: rgba(0,0,0,0.05); }
+
+        /* Utilities */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 500;
+            color: #202124;
+            margin-bottom: 16px;
+        }
+        .section-icon { color: #1a73e8; }
+
+        /* Scrollbar hide */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body>
+
+    <!-- Top App Bar -->
+    <header class="bg-white sticky top-0 z-20 shadow-sm">
+        <div class="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
+                    <i class="fa-solid fa-calendar-check text-blue-600 text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-normal text-gray-800 tracking-tight">Eplann</h1>
+                    <p class="text-xs text-gray-500 font-medium">Event Planner</p>
+                </div>
+            </div>
+            <button onclick="window.scrollTo(0,0)" class="btn-icon text-gray-600">
+                <i class="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="max-w-2xl mx-auto px-4 pt-6 space-y-6">
+
+        <!-- Place Section -->
+        <section class="card">
+            <div class="section-title">
+                <i class="fa-solid fa-location-dot section-icon"></i>
+                <span>The Place & Time</span>
+            </div>
+            
+            <!-- Occasion Input -->
+            <div class="input-group mb-4">
+                <input type="text" id="eventOccasion" class="material-input" placeholder=" " oninput="saveData()">
+                <label class="input-label">Occasion / Event Title (e.g., Team Outing)</label>
+            </div>
+            
+            <!-- Date Inputs (Start and End) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div class="input-group">
+                    <input type="date" id="eventDate" class="material-input" onchange="dateChanged()">
+                    <label class="input-label">Start Date</label>
+                </div>
+                <div class="input-group">
+                    <!-- Event End Date -->
+                    <input type="date" id="eventEndDate" class="material-input" onchange="dateChanged()">
+                    <label class="input-label">End Date</label>
+                </div>
+            </div>
+
+            <!-- Contribution Deadline -->
+            <div class="input-group mb-4">
+                <input type="date" id="contributionDeadline" class="material-input" onchange="saveData()">
+                <label class="input-label">Contribution Deadline</label>
+            </div>
+
+            <div class="flex gap-2 mb-4">
+                <div class="input-group flex-1">
+                    <input type="time" id="eventStartTime" class="material-input" onchange="saveData()">
+                    <label class="input-label">Start Time</label>
+                </div>
+                <div class="input-group flex-1">
+                    <input type="time" id="eventEndTime" class="material-input" onchange="saveData()">
+                    <label class="input-label">End Time</label>
+                </div>
+            </div>
+
+            <!-- Meeting Place and Call Time -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2 mb-4">
+                <div class="input-group">
+                    <input type="text" id="meetingPlace" class="material-input" placeholder=" " oninput="saveData()">
+                    <label class="input-label">Meeting Place (e.g., Mall Exit)</label>
+                </div>
+                <div class="input-group">
+                    <input type="time" id="callTime" class="material-input" onchange="saveData()">
+                    <label class="input-label">Call Time (Departure)</label>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="location" class="material-input" placeholder=" " oninput="saveData()">
+                <label class="input-label">Venue / Location</label>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mt-4">
+                <div class="input-group">
+                    <input type="number" id="entranceFee" class="material-input" placeholder=" " oninput="calc()">
+                    <label class="input-label">Entrance Fee (per person)</label>
+                </div>
+                
+                <!-- Unit Shelter Cost Input -->
+                <div class="input-group">
+                    <input type="number" id="unitShelterCost" class="material-input" placeholder=" " oninput="calc()">
+                    <label class="input-label">Shelter Cost (Fixed/Per Day)</label>
+                </div>
+            </div>
+            
+            <!-- Total Stays Input (Conditional) -->
+            <div id="multiDayShelter" class="grid grid-cols-2 gap-4 mt-2 hidden">
+                <div class="input-group">
+                    <input type="text" id="shelterType" class="material-input" placeholder=" " oninput="saveData()">
+                    <label class="input-label">Shelter Type (e.g., Cottage)</label>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="totalStays" class="material-input" placeholder="1" oninput="calc()">
+                    <label class="input-label">Total Days/Nights Stay</label>
+                    <p class="text-xs text-gray-500 mt-1 pl-2">Final Cost: <span id="finalShelterCostDisplay" class="font-bold text-gray-700">0.00</span></p>
+                </div>
+            </div>
+            
+            <!-- Fallback/Single-Day Shelter Type Input -->
+            <div id="singleDayShelterType" class="input-group mt-2">
+                <input type="text" id="shelterTypeSingle" class="material-input" placeholder=" " oninput="saveData()">
+                <label class="input-label">Shelter Type (e.g., Cottage)</label>
+            </div>
+
+        </section>
+
+        <!-- Transportation Section (REVAMPED) -->
+        <section class="card border-l-4 border-blue-500">
+            <div class="flex justify-between items-center mb-4">
+                <div class="section-title mb-0">
+                    <i class="fa-solid fa-bus section-icon"></i>
+                    <span>Transportation</span>
+                </div>
+                
+                <!-- Service Toggle Switch -->
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-medium text-gray-600" id="serviceLabel">Service</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="serviceToggle" class="sr-only peer" onchange="toggleServiceMode()">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white peer-checked:after:bg-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="bg-blue-50 p-3 rounded-lg text-sm text-blue-800 mb-4 flex items-start gap-2">
+                <i class="fa-solid fa-circle-info mt-1"></i>
+                <span id="transportInfo">Standard Mode: Fares are calculated per person.</span>
+            </div>
+
+            <!-- Standard Fare Inputs -->
+            <div id="fareInputs" class="grid grid-cols-2 gap-4 transition-all duration-300">
+                <div class="input-group">
+                    <input type="number" id="fareGoing" class="material-input" placeholder=" " oninput="calc()">
+                    <label class="input-label">Fare (Going)</label>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="fareBack" class="material-input" placeholder=" " oninput="calc()">
+                    <label class="input-label">Fare (Return)</label>
+                </div>
+            </div>
+
+            <!-- Service Inputs -->
+            <div id="serviceInputs" class="hidden grid-cols-1 sm:grid-cols-2 gap-4 transition-all duration-300">
+                <div class="input-group">
+                    <input type="text" id="serviceType" class="material-input" placeholder=" " oninput="calc()">
+                    <label class="input-label">Service Type (e.g. Van)</label>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="serviceCost" class="material-input" placeholder=" " oninput="calc()">
+                    <label class="input-label">Total Service Cost</label>
+                </div>
+            </div>
+        </section>
+
+        <!-- Members Section -->
+        <section class="card">
+            <div class="flex justify-between items-center mb-4">
+                <div class="section-title mb-0">
+                    <i class="fa-solid fa-users section-icon"></i>
+                    <span>Members</span>
+                </div>
+                <span id="count" class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">0/30</span>
+            </div>
+
+            <!-- Bulk Contribution Input (ALIGNMENT FIX) -->
+            <div class="flex gap-2 mb-4 items-end">
+                <div class="input-group flex-grow mb-0">
+                    <input type="number" id="bulkVal" class="material-input rounded-r-none" placeholder=" ">
+                    <label class="input-label">Set Bulk Contribution</slabel>
+                </div>
+                <button onclick="applyBulk()" class="bg-gray-800 text-white rounded-r-lg rounded-l-none px-4 h-[50px] font-medium hover:bg-gray-900 transition-colors shrink-0">Set</button>
+            </div>
+
+            <!-- Add Member Input (ALIGNMENT FIX) -->
+            <div class="flex gap-2 mb-6 items-end">
+                <div class="input-group flex-grow mb-0">
+                    <input type="text" id="memName" class="material-input rounded-r-none" placeholder=" ">
+                    <label class="input-label">Add Member Name</label>
+                </div>
+                <button onclick="addMem()" class="btn-primary rounded-l-none h-[50px] px-6 rounded-r-lg shrink-0"><i class="fa-solid fa-plus"></i></button>
+            </div>
+
+            <div id="memList" class="space-y-3">
+                <!-- Members will appear here -->
+                <div class="text-center text-gray-400 py-6 text-sm">No members yet. Add someone above!</div>
+            </div>
+        </section>
+
+        <!-- Expenses Section -->
+        <section class="card">
+            <div class="section-title">
+                <i class="fa-solid fa-receipt section-icon"></i>
+                    <span>Expenses</span>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex border-b border-gray-200 mb-6">
+                <button onclick="switchTab('food')" id="tab-food" class="flex-1 pb-3 text-sm font-medium text-blue-600 border-b-2 border-blue-600 transition-all">Foods</button>
+                <button onclick="switchTab('drink')" id="tab-drink" class="flex-1 pb-3 text-sm font-medium text-gray-500 hover:text-gray-700 transition-all">Drinks</button>
+                <button onclick="switchTab('other')" id="tab-other" class="flex-1 pb-3 text-sm font-medium text-gray-500 hover:text-gray-700 transition-all">Others</button>
+            </div>
+
+            <!-- Add Expense Input (ALIGNMENT FIX) -->
+            <div class="flex gap-2 mb-4 items-end">
+                <div class="input-group flex-[2] mb-0">
+                    <input type="text" id="itemName" class="material-input rounded-r-none" placeholder=" ">
+                    <label class="input-label">Item Name</label>
+                </div>
+                <div class="input-group flex-1 mb-0">
+                    <input type="number" id="itemPrice" class="material-input rounded-none" placeholder=" ">
+                    <label class="input-label">Price</label>
+                </div>
+                <button onclick="addExpense()" class="btn-primary rounded-l-none h-[50px] px-4 rounded-r-lg shrink-0"><i class="fa-solid fa-plus"></i></button>
+            </div>
+
+            <div class="bg-gray-50 rounded-xl p-4 min-h-[100px]">
+                <div id="list-food" class="block"></div>
+                <div id="list-drink" class="hidden"></div>
+                <div id="list-other" class="hidden"></div>
+            </div>
+        </section>
+
+        <!-- To Bring Section -->
+        <section class="card mb-20">
+            <div class="flex justify-between items-center mb-4">
+                <div class="section-title mb-0">
+                    <i class="fa-solid fa-suitcase section-icon"></i>
+                    <span>To Bring</span>
+                </div>
+                <button onclick="saveBringListImage()" class="btn-secondary h-[40px] px-4 py-1 text-sm rounded-full flex items-center gap-2 hover:shadow-md">
+                    <i class="fa-solid fa-download"></i> Save List
+                </button>
+            </div>
+            
+            <div class="space-y-3 mb-4">
+                <div class="input-group">
+                    <input type="text" id="bringItem" class="material-input" placeholder=" ">
+                    <label class="input-label">Item to bring</label>
+                </div>
+                <div class="flex gap-2 items-end">
+                    <div class="input-group flex-1 mb-0">
+                        <!-- Select Input also needs material-input class and fixed height -->
+                        <select id="bringAssignee" class="material-input h-[50px] appearance-none rounded-r-none">
+                            <option value="">Assign to...</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-gray-400 pointer-events-none"></i>
+                        <!-- The select input does not need an input-label because it has default selected text. -->
+                    </div>
+                    <button onclick="addBring()" class="btn-primary rounded-l-none h-[50px] rounded-r-lg shrink-0">Add</button>
+                </div>
+            </div>
+            <ul id="bringList" class="space-y-2"></ul>
+        </section>
+
+    </div>
+
+    <!-- Bottom Sheet / Total Bar (MODIFIED FOR MINIMIZATION) -->
+    <div id="totalBar" class="fixed bottom-0 left-0 w-full z-30">
+        <div class="max-w-2xl mx-auto bg-white rounded-t-3xl shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.15)] safe-area-bottom">
+            
+            <!-- Minimized Header / Toggle Area -->
+            <div onclick="toggleTotalBar()" class="p-5 cursor-pointer flex justify-between items-center transition-all duration-300">
+                <div class="flex items-center gap-4">
+                    <i id="toggleIcon" class="fa-solid fa-chevron-up text-gray-500 transition-transform duration-300"></i>
+                    <div>
+                        <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-0.5">Total Expenses</div>
+                        <div class="text-xl font-bold text-gray-900 tracking-tight" id="grandTotal">0.00</div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-0.5">Balance</div>
+                    <div class="text-lg font-bold font-mono text-green-600" id="balance">0.00</div>
+                </div>
+            </div>
+
+            <!-- Collapsible Detail Content -->
+            <div id="collapsibleContent" class="h-0 overflow-hidden transition-all duration-300 px-5">
+                
+                <div class="grid grid-cols-3 gap-2 text-[10px] text-gray-500 mb-4 bg-gray-50 p-2 rounded-lg text-center">
+                    <div>
+                        <div class="font-bold text-gray-700">Transport</div>
+                        <div id="subFare">0</div>
+                    </div>
+                    <div class="border-x border-gray-200">
+                        <div class="font-bold text-gray-700">Logistics</div>
+                        <div id="subLogistics">0</div>
+                    </div>
+                    <div>
+                        <div class="font-bold text-gray-700">Items</div>
+                        <div id="subItems">0</div>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3 pb-8">
+                    <button onclick="saveAsInvitationImage()" class="flex-1 bg-indigo-100 text-indigo-700 rounded-xl px-4 py-3 text-sm font-bold hover:bg-indigo-200 transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i> Invite
+                    </button>
+                    <button onclick="saveAsReceipt()" class="flex-1 bg-gray-900 text-white rounded-xl px-4 py-3 text-sm font-bold hover:bg-black transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-receipt"></i> Receipt
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Containers for Generation -->
+    <div id="receiptContainer" class="absolute pointer-events-none" style="left: -9999px; top: 0;"></div>
+    <div id="invitationContainer" class="absolute pointer-events-none" style="left: -9999px; top: 0;"></div>
+    <div id="bringListContainer" class="absolute pointer-events-none" style="left: -9999px; top: 0;"></div>
+
+
+    <script>
+        const LOCAL_STORAGE_KEY = 'eplann_data_v4'; // Updated key for new fields
+        let members = [];
+        let expenses = { food: [], drink: [], other: [] };
+        let bringList = [];
+        let currentTab = 'food';
+        let isServiceMode = false;
+        let isTotalBarMinimized = true; 
+
+        const el = (id) => document.getElementById(id);
+        const val = (id) => parseFloat(el(id).value) || 0;
+        const fmt = (n) => n.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+        // Helper function to format 24h time to 12h time (HH:MM -> HH:MM AM/PM)
+        function formatTime12Hr(time24) {
+            if (!time24) return 'TBD';
+            const parts = time24.split(':');
+            if (parts.length < 2) return 'TBD';
+            let hours = parseInt(parts[0], 10);
+            const minutes = parts[1];
+            if (isNaN(hours) || isNaN(minutes)) return 'TBD';
+            
+            const period = hours >= 12 ? 'PM' : 'AM';
+            const hour12 = hours % 12 || 12;
+            
+            return `${hour12}:${minutes} ${period}`;
+        }
+        
+        function formatDateLong(dateString) {
+            if (!dateString) return 'Date TBD';
+            try {
+                // Parse date string (YYYY-MM-DD)
+                const date = new Date(dateString + 'T00:00:00'); 
+                if (isNaN(date)) return 'Date TBD';
+                
+                return date.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+            } catch (e) {
+                return 'Date TBD';
+            }
+        }
+        
+        // Helper function to format date string to Month DD, YYYY (e.g., Dec 11, 2025)
+        function formatDateShort(dateString) {
+            if (!dateString) return 'TBD';
+            try {
+                const date = new Date(dateString + 'T00:00:00');
+                if (isNaN(date)) return 'TBD';
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            } catch (e) {
+                return 'TBD';
+            }
+        }
+
+        // --- Persistence ---
+
+        function saveData() {
+            const appState = {
+                members,
+                expenses,
+                bringList,
+                isServiceMode,
+                isTotalBarMinimized, 
+                inputValues: {
+                    eventOccasion: el('eventOccasion').value, 
+                    eventDate: el('eventDate').value,
+                    eventEndDate: el('eventEndDate').value, // NEW: End Date
+                    contributionDeadline: el('contributionDeadline').value, 
+                    eventStartTime: el('eventStartTime').value,
+                    eventEndTime: el('eventEndTime').value,
+                    meetingPlace: el('meetingPlace').value, 
+                    callTime: el('callTime').value,         
+                    location: el('location').value,
+                    entranceFee: el('entranceFee').value,
+                    unitShelterCost: el('unitShelterCost').value, // RENAMED: Unit cost
+                    totalStays: el('totalStays').value,         // NEW: Total stays
+                    shelterType: el('shelterType').value,
+                    shelterTypeSingle: el('shelterTypeSingle').value, // Fallback type
+                    fareGoing: el('fareGoing').value,
+                    fareBack: el('fareBack').value,
+                    serviceType: el('serviceType').value,
+                    serviceCost: el('serviceCost').value,
+                    bulkVal: el('bulkVal').value
+                }
+            };
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(appState));
+        }
+
+        function loadData() {
+            try {
+                const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (storedData) {
+                    const appState = JSON.parse(storedData);
+                    members = appState.members || [];
+                    expenses = appState.expenses || { food: [], drink: [], other: [] };
+                    bringList = appState.bringList || [];
+                    isServiceMode = appState.isServiceMode || false;
+                    isTotalBarMinimized = appState.isTotalBarMinimized ?? true; 
+
+                    // Restore toggle
+                    el('serviceToggle').checked = isServiceMode;
+                    toggleServiceMode(false); // don't recalc yet
+
+                    if (appState.inputValues) {
+                        Object.keys(appState.inputValues).forEach(id => {
+                            const element = el(id);
+                            const valueToLoad = appState.inputValues[id];
+                            if (element && valueToLoad !== undefined) {
+                                element.value = valueToLoad;
+                            }
+                        });
+                    }
+                }
+            } catch (e) {
+                console.error("Load error:", e);
+            }
+        }
+        
+        // --- Date Logic and Conditional Shelter Inputs ---
+
+        function calculateStays(startDate, endDate) {
+            if (!startDate || !endDate) return 1;
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            
+            // Set time to 00:00:00 to ensure only day difference is calculated reliably
+            start.setHours(0, 0, 0, 0);
+            end.setHours(0, 0, 0, 0);
+
+            if (start > end) return 1;
+
+            const diffTime = Math.abs(end - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+            
+            // For a single day, difference is 0. 
+            // For one night stay, difference is 1. We assume 1 night for 1 day difference, minimum 1 stay.
+            return Math.max(1, diffDays);
+        }
+
+        function updateShelterCostInputs() {
+            const endDate = el('eventEndDate').value;
+            const multiDayDiv = el('multiDayShelter');
+            const singleDayType = el('singleDayShelterType');
+            const unitCostInput = el('unitShelterCost');
+            
+            if (endDate) {
+                multiDayDiv.classList.remove('hidden');
+                singleDayType.classList.add('hidden');
+                
+                // Change label of unit cost
+                unitCostInput.nextElementSibling.innerText = "Shelter Cost (Per Day/Night)";
+
+                // Auto-fill totalStays based on date difference (only if it's 0 or empty)
+                const startDate = el('eventDate').value;
+                const currentStays = el('totalStays').value;
+                if (!currentStays || currentStays === '0' || currentStays === '1') {
+                    const calculatedStays = calculateStays(startDate, endDate);
+                    el('totalStays').value = calculatedStays;
+                }
+            } else {
+                multiDayDiv.classList.add('hidden');
+                singleDayType.classList.remove('hidden');
+                
+                // Revert label of unit cost
+                unitCostInput.nextElementSibling.innerText = "Shelter Cost (Fixed)";
+                
+                // Clear totalStays if we revert to single day
+                el('totalStays').value = 1; 
+            }
+            calc();
+            saveData();
+        }
+
+        function dateChanged() {
+            // When start/end date changes, trigger UI update and calc
+            updateShelterCostInputs();
+        }
+
+
+        // --- Total Bar Minimization Logic ---
+
+        function toggleTotalBar() {
+            isTotalBarMinimized = !isTotalBarMinimized;
+            updateTotalBarUI();
+            saveData();
+        }
+
+        function updateTotalBarUI() {
+            const content = el('collapsibleContent');
+            const icon = el('toggleIcon');
+            const totalBarContainer = el('totalBar').querySelector('.max-w-2xl');
+
+            if (isTotalBarMinimized) {
+                content.style.height = '0px';
+                icon.style.transform = 'rotate(0deg)';
+                totalBarContainer.classList.add('rounded-t-3xl');
+                totalBarContainer.classList.remove('rounded-t-lg');
+            } else {
+                // Calculate and set a fixed height for a smooth transition
+                const innerContentHeight = 120; 
+                content.style.height = `${innerContentHeight}px`; 
+                icon.style.transform = 'rotate(180deg)';
+                totalBarContainer.classList.remove('rounded-t-3xl');
+                totalBarContainer.classList.add('rounded-t-lg');
+            }
+        }
+
+        // --- Service Mode Logic ---
+
+        function toggleServiceMode(shouldSave = true) {
+            isServiceMode = el('serviceToggle').checked;
+            const fareInputs = el('fareInputs');
+            const serviceInputs = el('serviceInputs');
+            const info = el('transportInfo');
+
+            if (isServiceMode) {
+                fareInputs.classList.add('hidden');
+                fareInputs.classList.remove('grid');
+                serviceInputs.classList.remove('hidden');
+                serviceInputs.classList.add('grid');
+                info.innerText = "Service Mode: Total cost of vehicle/service is shared.";
+            } else {
+                serviceInputs.classList.add('hidden');
+                serviceInputs.classList.remove('grid');
+                fareInputs.classList.remove('hidden');
+                fareInputs.classList.add('grid');
+                info.innerText = "Standard Mode: Fares are calculated per person.";
+            }
+
+            if (shouldSave) {
+                calc();
+                saveData();
+            }
+        }
+
+        // --- Core Calc ---
+
+        function calc() {
+            const memberCount = members.length;
+            
+            // Transport Cost Calculation
+            let totalTransport = 0;
+            if (isServiceMode) {
+                // In service mode, it's a fixed total cost (e.g., Van Rental)
+                totalTransport = val('serviceCost');
+            } else {
+                // In standard mode, it's per person
+                const unitFare = val('fareGoing') + val('fareBack');
+                totalTransport = unitFare * memberCount;
+            }
+
+            const unitEntranceFee = val('entranceFee');
+            const totalEntranceFee = unitEntranceFee * memberCount;
+            
+            // NEW: Conditional Shelter Cost Calculation
+            let finalShelterCost = 0;
+            const unitShelterCost = val('unitShelterCost');
+            
+            if (el('eventEndDate').value) {
+                const totalStays = val('totalStays');
+                finalShelterCost = unitShelterCost * totalStays;
+                el('finalShelterCostDisplay').innerText = fmt(finalShelterCost);
+            } else {
+                finalShelterCost = unitShelterCost; // Fixed cost for single day
+                // Clear display if not in multi-day mode
+                el('finalShelterCostDisplay').innerText = ''; 
+            }
+            
+            const logistics = totalEntranceFee + finalShelterCost;
+            
+            const sumFood = expenses.food.reduce((a, b) => a + b.price, 0);
+            const sumDrink = expenses.drink.reduce((a, b) => a + b.price, 0);
+            const sumOther = expenses.other.reduce((a, b) => a + b.price, 0);
+            const sumItems = sumFood + sumDrink + sumOther;
+
+            const grandTotal = totalTransport + logistics + sumItems;
+            
+            const totalContrib = members.reduce((a, b) => a + b.contrib, 0);
+            const balance = totalContrib - grandTotal;
+
+            // UI Updates
+            el('grandTotal').innerText = fmt(grandTotal);
+            el('balance').innerText = (balance >= 0 ? "+" : "") + fmt(balance);
+            el('balance').className = `text-lg font-bold font-mono ${balance >= 0 ? 'text-green-600' : 'text-red-500'}`;
+
+            el('subFare').innerText = fmt(totalTransport);
+            el('subLogistics').innerText = fmt(logistics);
+            el('subItems').innerText = fmt(sumItems);
+
+            if (currentTab === 'food') updateTabTotal(sumFood, 'food');
+            if (currentTab === 'drink') updateTabTotal(sumDrink, 'drink');
+            if (currentTab === 'other') updateTabTotal(sumOther, 'other');
+
+            // Update UI state for minimization if it's not minimized
+            if (!isTotalBarMinimized) {
+                updateTotalBarUI();
+            }
+        }
+
+        // --- Members ---
+
+        function addMem() {
+            const name = el('memName').value.trim();
+            if(!name) return;
+            if (members.length >= 30) { 
+                const message = document.createElement('div');
+                message.className = 'fixed top-4 right-4 bg-red-500 text-white p-3 rounded-lg shadow-xl z-50';
+                message.innerText = 'Maximum 30 members reached.';
+                document.body.appendChild(message);
+                setTimeout(() => message.remove(), 3000);
+                return;
+            }
+            
+            // Use bulkVal as default contribution for new members
+            const defaultContrib = val('bulkVal');
+
+            members.push({ id: Date.now(), name, contrib: defaultContrib });
+            el('memName').value = '';
+            renderMem();
+            calc(); 
+            saveData();
+        }
+
+        function removeMem(id) {
+            members = members.filter(m => m.id !== id);
+            renderMem();
+            renderBring();
+            calc();
+            saveData();
+        }
+
+        function updateContrib(id, amt) {
+            const m = members.find(x => x.id === id);
+            if(m) { m.contrib = parseFloat(amt) || 0; calc(); saveData(); }
+        }
+
+        function applyBulk() {
+            const amt = val('bulkVal');
+            members.forEach(m => m.contrib = amt);
+            renderMem();
+            calc();
+            saveData();
+        }
+
+        function renderMem() {
+            const list = el('memList');
+            const sel = el('bringAssignee');
+            const prevSel = sel.value;
+
+            list.innerHTML = members.length ? '' : '<div class="text-center text-gray-400 py-6 text-sm">No members yet. Add someone above!</div>';
+            
+            members.forEach(m => {
+                const div = document.createElement('div');
+                div.className = "flex items-center justify-between bg-white p-3 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow";
+                div.innerHTML = `
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm">
+                            ${m.name.substring(0,2).toUpperCase()}
+                        </div>
+                        <span class="font-medium text-gray-800 truncate">${m.name}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="number" value="${m.contrib || ''}" placeholder="0"
+                            class="w-24 bg-gray-50 border-b border-gray-200 rounded-t px-2 py-2 text-right focus:border-blue-500 outline-none text-sm transition-colors"
+                            oninput="updateContrib(${m.id}, this.value)">
+                        <button onclick="removeMem(${m.id})" class="text-gray-400 hover:text-red-500 w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50 transition-colors"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+
+            el('count').innerText = `${members.length}/30`;
+
+            sel.innerHTML = '<option value="">Assign to...</option>';
+            members.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.name;
+                opt.innerText = m.name;
+                sel.appendChild(opt);
+            });
+            sel.value = prevSel;
+        }
+
+        // --- Expenses ---
+
+        function switchTab(tab) {
+            currentTab = tab;
+            ['food', 'drink', 'other'].forEach(t => {
+                const btn = el(`tab-${t}`);
+                const list = el(`list-${t}`);
+                if(t === tab) {
+                    btn.className = "flex-1 pb-3 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition-all";
+                    btn.style.color = "#1a73e8";
+                    btn.style.borderBottomColor = "#1a73e8";
+                    list.classList.remove('hidden');
+                } else {
+                    btn.className = "flex-1 pb-3 text-sm font-medium text-gray-500 hover:text-gray-700 transition-all border-b-2 border-transparent";
+                    btn.style.color = "#5f6368";
+                    btn.style.borderBottomColor = "transparent";
+                    list.classList.add('hidden');
+                }
+            });
+            renderExpenses();
+        }
+
+        function addExpense() {
+            const name = el('itemName').value.trim();
+            const price = val('itemPrice');
+            if(!name || price <= 0) return;
+            expenses[currentTab].push({ id: Date.now(), name, price });
+            el('itemName').value = '';
+            el('itemPrice').value = '';
+            renderExpenses();
+            calc();
+            saveData();
+        }
+
+        function removeExpense(type, id) {
+            expenses[type] = expenses[type].filter(x => x.id !== id);
+            renderExpenses();
+            calc();
+            saveData();
+        }
+
+        function updateTabTotal(total, type) {
+            const listContainer = el(`list-${type}`);
+            const existingTotal = listContainer.querySelector('.tab-total-row');
+            if (existingTotal) existingTotal.remove();
+
+            if (total > 0 || expenses[type].length > 0) {
+                const totalRow = document.createElement('div');
+                totalRow.className = "tab-total-row flex justify-between items-center py-3 px-2 mt-2 border-t border-gray-200";
+                totalRow.innerHTML = `
+                    <span class="text-sm font-bold text-gray-600">Total ${type}:</span>
+                    <span class="text-lg font-bold text-blue-600 font-mono">${fmt(total)}</span>
+                `;
+                listContainer.appendChild(totalRow);
+            }
+        }
+
+        function renderExpenses() {
+            const list = el(`list-${currentTab}`);
+            const data = expenses[currentTab];
+            const total = data.reduce((a, b) => a + b.price, 0);
+
+            list.innerHTML = ''; 
+            if (data.length === 0) {
+                list.innerHTML = `<div class="text-center text-gray-400 text-xs py-4 italic">No items yet.</div>`;
+            } else {
+                data.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = "flex justify-between items-center py-2 px-2 border-b border-gray-100 last:border-0";
+                    div.innerHTML = `
+                        <span class="text-sm text-gray-800">${item.name}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm text-gray-600 font-mono">${fmt(item.price)}</span>
+                            <button onclick="removeExpense('${currentTab}', ${item.id})" class="text-gray-400 hover:text-red-500 w-6 h-6 flex items-center justify-center rounded-full hover:bg-red-50 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                });
+            }
+            updateTabTotal(total, currentTab);
+        }
+
+        // --- To Bring ---
+
+        function addBring() {
+            const item = el('bringItem').value.trim();
+            const assignee = el('bringAssignee').value;
+            if(!item || !assignee) return;
+            bringList.push({ id: Date.now(), item, assignee });
+            el('bringItem').value = '';
+            el('bringAssignee').value = '';
+            renderBring();
+            saveData();
+        }
+
+        function removeBring(id) {
+            bringList = bringList.filter(b => b.id !== id);
+            renderBring();
+            saveData();
+        }
+
+        function renderBring() {
+            const list = el('bringList');
+            list.innerHTML = '';
+            if (bringList.length === 0) {
+                list.innerHTML = '<li class="text-center text-gray-400 py-4 text-sm">No assignments yet.</li>';
+            } else {
+                bringList.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = "flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-200";
+                    li.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-check text-green-500"></i>
+                            <span class="text-sm font-medium text-gray-700">${item.item}</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs text-gray-500">
+                            <span>Assigned to: <span class="font-bold text-gray-700">${item.assignee}</span></span>
+                            <button onclick="removeBring(${item.id})" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    `;
+                    list.appendChild(li);
+                });
+            }
+        }
+        
+        // --- Save Bring List Image ---
+        
+        function generateBringListContent() {
+            const container = el('bringListContainer');
+            const occasion = el('eventOccasion').value || 'An Event';
+            const dateInput = el('eventDate').value;
+            const formattedDate = formatDateLong(dateInput);
+            
+            // FIX: Added items-center to ensure vertical alignment of content
+            const bringListHtml = bringList.map(item => `
+                <div class="flex justify-between items-center py-3 border-b border-dashed border-gray-200 last:border-b-0 px-2">
+                    <span class="text-base text-gray-800 font-medium">${item.item}</span>
+                    <span class="text-sm text-blue-600 font-bold bg-blue-50 px-3 py-1 rounded-full flex items-center">${item.assignee}</span>
+                </div>
+            `).join('');
+            
+            // Increased padding inside the card to push the content down slightly
+            container.innerHTML = `
+                <div class="bg-white p-8 w-[450px] mx-auto text-sm shadow-xl font-sans text-slate-800 border-t-4 border-teal-500">
+                    <div class="text-center pb-4 border-b border-slate-200 mb-6"> 
+                        <h2 class="text-xl font-bold text-slate-900">${occasion}</h2>
+                        <div class="text-sm font-medium text-slate-500 mt-1">${formattedDate}</div>
+                        <h3 class="text-2xl font-black uppercase tracking-wider text-teal-600 mt-3">What to Bring</h3>
+                    </div>
+
+                    <div class="space-y-3">
+                        ${bringListHtml || '<div class="text-center text-gray-400 text-sm py-8">The list is empty!</div>'}
+                    </div>
+
+                    <div class="text-xs text-center text-gray-400 pt-6 mt-6 border-t border-gray-100">
+                        Please secure your assigned items before the event.
+                    </div>
+                </div>
+            `;
+            return container;
+        }
+
+        async function saveBringListImage() {
+            const container = el('bringListContainer');
+            const contentToCapture = generateBringListContent().firstElementChild;
+            if (!contentToCapture) return;
+            await captureAndDownloadImage(container, contentToCapture, 'Eplann_BringList');
+        }
+
+
+        // --- Receipt & Invite Generation ---
+
+        function generateReceiptContent() {
+            const container = el('receiptContainer');
+            calc(); 
+            const memberCount = members.length;
+            const grandTotal = parseFloat(el('grandTotal').innerText.replace(/,/g, ''));
+            const totalContrib = members.reduce((a, b) => a + b.contrib, 0);
+            const balance = totalContrib - grandTotal;
+            
+            // Event Details
+            const occasion = el('eventOccasion').value || 'Untitled Event'; 
+            const dateInput = el('eventDate').value;
+            const endDateInput = el('eventEndDate').value;
+            const formattedDate = formatDateLong(dateInput);
+            const formattedEndDate = formatDateLong(endDateInput);
+
+            const deadlineInput = el('contributionDeadline').value;
+            const formattedDeadline = deadlineInput ? formatDateLong(deadlineInput) : 'N/A';
+            const start = formatTime12Hr(el('eventStartTime').value);
+            const end = formatTime12Hr(el('eventEndTime').value);
+            const call = formatTime12Hr(el('callTime').value); 
+            const meetingPlace = el('meetingPlace').value || 'TBD'; 
+            const finalShelterCost = parseFloat(el('subLogistics').innerText.replace(/,/g, '')) - (val('entranceFee') * memberCount);
+
+            let dateRangeHtml = '';
+            if (endDateInput) {
+                dateRangeHtml = `
+                    <span class="text-slate-600 text-xs block font-mono">
+                        <span class="font-bold text-slate-700">Ends:</span> ${formattedEndDate}
+                    </span>
+                `;
+            }
+
+            let timeRangeHtml;
+            if (start !== 'TBD' && end !== 'TBD') {
+                timeRangeHtml = `
+                    <span class="text-slate-600 text-xs block font-mono">
+                        <span class="font-bold text-slate-700">Start:</span> ${start}<br>
+                        <span class="font-bold text-slate-700">End:</span> ${end}
+                    </span>
+                `;
+            } else {
+                 timeRangeHtml = '<span class="text-slate-600 text-xs block font-mono">Time TBD</span>';
+            }
+
+
+            // Data gathering
+            const unitEntranceFee = val('entranceFee');
+            const unitShelterCost = val('unitShelterCost');
+            const totalStays = val('totalStays');
+            const shelterType = el('eventEndDate').value ? el('shelterType').value || 'Cottage/Area' : el('shelterTypeSingle').value || 'Cottage/Area';
+            const totalEntranceFee = unitEntranceFee * memberCount;
+            
+            // --- 1. Transport HTML Generation ---
+            let transportHtml = '';
+            let transportTotal = 0;
+
+            if (isServiceMode) {
+                const sType = el('serviceType').value || 'Service';
+                const sCost = val('serviceCost');
+                transportTotal = sCost;
+                transportHtml = `
+                    <div class="flex justify-between items-start py-2"> 
+                        <div class="flex flex-col">
+                            <span class="text-slate-700">Total Vehicle Service (${sType})</span>
+                            <span class="text-[10px] text-slate-400 font-mono">Fixed cost, shared by ${memberCount} members</span>
+                        </div>
+                        <span class="font-mono font-bold text-slate-800">${fmt(sCost)}</span>
+                    </div>
+                `;
+            } else {
+                const going = val('fareGoing');
+                const back = val('fareBack');
+                transportTotal = (going + back) * memberCount;
+                transportHtml = `
+                    <div class="flex justify-between items-start py-2"> 
+                        <div class="flex flex-col">
+                            <span class="text-slate-700">Fare (Going)</span>
+                            <span class="text-[10px] text-slate-400 font-mono">${memberCount} pax x ${fmt(going)}</span>
+                        </div>
+                        <span class="font-mono font-bold text-slate-800">${fmt(going * memberCount)}</span>
+                    </div>
+                    <div class="flex justify-between items-start py-2"> 
+                        <div class="flex flex-col">
+                            <span class="text-slate-700">Fare (Return)</span>
+                            <span class="text-[10px] text-slate-400 font-mono">${memberCount} pax x ${fmt(back)}</span>
+                        </div>
+                        <span class="font-mono font-bold text-slate-800">${fmt(back * memberCount)}</span>
+                    </div>
+                `;
+            }
+            
+            // --- 2. Member Contributions HTML Generation ---
+            const memberContribsHtml = members.map(m => `
+                <div class="flex justify-between items-start py-1 text-sm"> 
+                    <span class="text-slate-700 flex-grow pr-4 pl-2">${m.name}</span>
+                    <span class="font-mono text-slate-800 whitespace-nowrap">${fmt(m.contrib)}</span>
+                </div>
+            `).join('');
+
+
+            // --- 3. Item Groups HTML Generation ---
+            const itemGroup = (title, list) => {
+                const total = list.reduce((a, b) => a + b.price, 0);
+                if (list.length === 0) return '';
+                const itemRows = list.map(item => `
+                    <div class="flex justify-between items-start py-1 text-sm"> 
+                        <span class="text-slate-700 flex-grow pr-4 pl-2">${item.name}</span>
+                        <span class="font-mono text-slate-800 whitespace-nowrap">${fmt(item.price)}</span>
+                    </div>
+                `).join('');
+                return `
+                    <div class="mt-4 pb-4 border-b border-dashed border-gray-200 last:border-b-0"> 
+                        <h4 class="text-sm font-semibold text-gray-800 uppercase border-b border-dashed border-gray-300 pb-1 mb-2">${title}</h4>
+                        <div class="space-y-1">
+                            ${itemRows}
+                        </div>
+                        <div class="flex justify-between items-center pt-3 border-t border-gray-200 mt-2">
+                            <span class="text-sm font-bold text-blue-600">Total ${title}</span>
+                            <span class="font-mono text-base font-bold text-blue-600">${fmt(total)}</span>
+                        </div>
+                    </div>
+                `;
+            };
+
+            const foodHtml = itemGroup('Food Expenses', expenses.food);
+            const drinkHtml = itemGroup('Drink Expenses', expenses.drink);
+            const otherHtml = itemGroup('Other Expenses', expenses.other);
+
+            // Shelter Cost Logic for Receipt
+            let shelterCostText = '';
+            let shelterBreakdown = '';
+            if (endDateInput) {
+                shelterCostText = `Total ${shelterType} Cost (${totalStays} days/nights)`;
+                shelterBreakdown = `<span class="text-[10px] text-slate-400 font-mono">${fmt(unitShelterCost)} x ${totalStays} days/nights</span>`;
+            } else {
+                shelterCostText = `${shelterType} Cost (Fixed)`;
+                shelterBreakdown = `<span class="text-[10px] text-slate-400 font-mono">Fixed cost</span>`;
+            }
+
+
+            // Receipt HTML
+            container.innerHTML = `
+                <div class="bg-white p-8 w-[450px] mx-auto text-sm shadow-xl font-sans text-slate-800 relative border-t-8 border-blue-600">
+                    <div class="text-center pb-6 border-b border-slate-200 mb-8"> 
+                        <h2 class="text-2xl font-black uppercase tracking-widest text-slate-900">${occasion}</h2>
+                        <div class="text-xs font-mono text-slate-500 mt-1 uppercase">Event Receipt Generated via Eplann</div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mb-8 text-xs text-slate-500 uppercase tracking-wide font-semibold"> 
+                        <div>
+                            <span class="block text-[10px] text-slate-400">Event Date(s)</span>
+                            <span class="text-slate-800 text-sm font-bold">${formattedDate}</span>
+                            ${dateRangeHtml}
+                            ${timeRangeHtml}
+                            <span class="text-slate-400 text-xs block pt-2">CONTRIBUTION DEADLINE</span>
+                            <span class="text-red-500 text-sm font-bold block">${formattedDeadline}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="block text-[10px] text-slate-400">Total Bill</span>
+                            <span class="text-slate-800 text-xl font-black">${fmt(grandTotal)}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-8"> 
+                        <h3 class="text-base font-bold text-blue-600 uppercase mb-4 border-b-2 border-blue-100 pb-1">Event Details</h3> 
+                        <div class="space-y-1">
+                            <div class="flex justify-between items-center py-1"> 
+                                <span class="text-slate-700 font-medium">Meeting Place:</span>
+                                <span class="font-mono text-slate-800">${meetingPlace} @ ${call}</span>
+                            </div>
+                            <div class="flex justify-between items-center py-1"> 
+                                <span class="text-slate-700 font-medium">Venue:</span>
+                                <span class="font-mono text-slate-800">${el('location').value || 'Location TBD'}</span>
+                            </div>
+                            <div class="flex justify-between items-center py-1"> 
+                                <span class="text-slate-700 font-medium">Group Size:</span>
+                                <span class="font-mono text-slate-800">${memberCount} members</span>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- EXPENSES BREAKDOWN -->
+                    <div class="mb-8"> 
+                        <h3 class="text-base font-bold text-blue-600 uppercase mb-4 border-b-2 border-blue-100 pb-1">Logistics & Transport</h3> 
+                        <div class="space-y-2 border-l-2 border-slate-100 pl-3">
+                            <div class="flex justify-between items-start py-2"> 
+                                <div class="flex flex-col">
+                                    <span class="text-slate-700">Entrance Fees</span>
+                                    <span class="text-[10px] text-slate-400 font-mono">${memberCount} pax x ${fmt(unitEntranceFee)}</span>
+                                </div>
+                                <span class="font-mono font-bold text-slate-800">${fmt(totalEntranceFee)}</span>
+                            </div>
+                            <div class="flex justify-between items-start py-2"> 
+                                <div class="flex flex-col">
+                                    <span class="text-slate-700">${shelterCostText}</span>
+                                    ${shelterBreakdown}
+                                </div>
+                                <span class="font-mono font-bold text-slate-800">${fmt(finalShelterCost)}</span>
+                            </div>
+                            ${transportHtml}
+                        </div>
+                        <div class="flex justify-between items-center mt-4 pt-3 border-t border-dashed border-gray-300"> 
+                            <span class="text-sm font-bold text-gray-800">TOTAL LOGISTICS</span>
+                            <span class="font-mono text-lg font-bold text-gray-900">${fmt(transportTotal + totalEntranceFee + finalShelterCost)}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- MEMBER CONTRIBUTIONS -->
+                    <div class="mb-8"> 
+                        <h3 class="text-base font-bold text-blue-600 uppercase mb-4 border-b-2 border-blue-100 pb-1">Member Contributions</h3> 
+                        <div class="space-y-1">
+                            ${memberContribsHtml || '<div class="text-center text-gray-400 text-xs py-2 italic">No contributions recorded.</div>'}
+                        </div>
+                        <div class="flex justify-between items-center mt-4 pt-3 border-t border-dashed border-gray-300"> 
+                            <span class="text-sm font-bold text-gray-800">TOTAL CONTRIBUTED</span>
+                            <span class="font-mono text-lg font-bold text-gray-900">${fmt(totalContrib)}</span>
+                        </div>
+                    </div>
+
+                    <!-- ITEM EXPENSES -->
+                    <div class="mb-8"> 
+                        <h3 class="text-base font-bold text-blue-600 uppercase mb-4 border-b-2 border-blue-100 pb-1">Item Expenses</h3> 
+                        <div class="space-y-4">
+                            ${foodHtml}
+                            ${drinkHtml}
+                            ${otherHtml}
+                        </div>
+                        <div class="flex justify-between items-center mt-6 pt-3 border-t border-solid border-gray-400"> 
+                            <span class="text-sm font-bold text-gray-800">GRAND TOTAL ITEMS</span>
+                            <span class="font-mono text-lg font-bold text-gray-900">${fmt(expenses.food.reduce((a, b) => a + b.price, 0) + expenses.drink.reduce((a, b) => a + b.price, 0) + expenses.other.reduce((a, b) => a + b.price, 0))}</span>
+                        </div>
+                    </div>
+
+                    <!-- FINAL BALANCE SUMMARY -->
+                    <div class="p-6 mt-8 border-4 rounded-lg border-blue-100"> 
+                        <h3 class="text-sm font-bold uppercase text-blue-600 mb-4 border-b border-gray-200 pb-2">Final Settlement</h3> 
+                        <div class="flex justify-between items-center py-2"> 
+                            <span class="text-gray-600 text-sm font-medium">Total Contributions</span>
+                            <span class="font-mono font-extrabold text-green-600 text-base">${fmt(totalContrib)}</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 mb-4 border-b border-gray-300"> 
+                            <span class="text-gray-600 text-sm font-medium">Total Expenses Incurred</span>
+                            <span class="font-mono font-extrabold text-gray-800 text-base">-${fmt(grandTotal)}</span>
+                        </div>
+                        <div class="flex justify-between items-center pt-2">
+                            <span class="text-xl font-bold uppercase text-gray-900">NET BALANCE</span>
+                            <span class="text-2xl font-mono font-black ${balance >= 0 ? 'text-green-600' : 'text-red-600'}">
+                                ${balance >= 0 ? '+' : ''}${fmt(balance)}
+                            </span>
+                        </div>
+                        <p class="text-[10px] mt-4 text-gray-500 italic"> 
+                            ${balance >= 0 ? 'This positive balance indicates a surplus. Funds can be returned or saved for the next event.' : 'This negative balance indicates a shortfall. Additional contributions are required.'}
+                        </p>
+                    </div>
+                </div>
+            `;
+            return container;
+        }
+
+        async function saveAsReceipt() {
+            const container = el('receiptContainer');
+            const contentToCapture = generateReceiptContent().firstElementChild;
+            if (!contentToCapture) return;
+            await captureAndDownloadImage(container, contentToCapture, 'Eplann_Receipt');
+        }
+
+        function generateInvitationContent() {
+             const container = el('invitationContainer');
+             calc();
+             
+             // Date/Time/Location Data
+             const occasion = el('eventOccasion').value || 'An Event'; 
+             const dateInput = el('eventDate').value;
+             const endDateInput = el('eventEndDate').value;
+             // Use short format (now includes year) for a more concise invitation look
+             const formattedDateStart = formatDateShort(dateInput); 
+             const formattedDateEnd = formatDateShort(endDateInput);
+             const formattedDeadline = el('contributionDeadline').value ? formatDateShort(el('contributionDeadline').value) : 'TBD';
+             const loc = el('location').value || 'TBD';
+             const start = formatTime12Hr(el('eventStartTime').value);
+             const end = formatTime12Hr(el('eventEndTime').value);
+             const call = formatTime12Hr(el('callTime').value); 
+             const meetingPlace = el('meetingPlace').value || 'TBD'; 
+
+             // Contribution Calculation 
+             const requiredContribution = val('bulkVal'); 
+             const contribText = fmt(requiredContribution);
+             
+             const contributionDisplay = requiredContribution > 0 ? `
+                 <div class="mb-4 pb-4 border-b border-white/20">
+                    <span class="text-xs uppercase text-blue-200 font-bold tracking-wider">Required Contribution</span>
+                    <div class="text-2xl font-black text-white leading-tight font-mono">${contribText}</div>
+                    <span class="text-xs text-red-200 font-medium block mt-1">Due: ${formattedDeadline}</span>
+                </div>
+             ` : `<div class="mb-4 pb-4 border-b border-white/20">
+                    <span class="text-xs uppercase text-blue-200 font-bold tracking-wider">Required Contribution</span>
+                    <div class="text-sm font-medium text-white leading-tight font-mono">TBD / Not Required</div>
+                    <span class="text-xs text-red-200 font-medium block mt-1">Due: ${formattedDeadline}</span>
+                </div>`;
+                
+             // FIX: Updated Date Info HTML to handle single day vs multi-day clearly, now using year in short format
+             let dateInfoHtml = '';
+             if (endDateInput && dateInput !== endDateInput) {
+                dateInfoHtml = `
+                    <div class="text-base font-black text-white leading-snug">${formattedDateStart}</div>
+                    <span class="text-xs uppercase text-blue-200 font-bold tracking-wider pt-1 pb-1">to</span>
+                    <div class="text-base font-black text-white leading-snug">${formattedDateEnd}</div>
+                `;
+             } else {
+                 dateInfoHtml = `<div class="text-base font-black text-white leading-snug">${formattedDateStart}</div>`;
+             }
+
+
+             container.innerHTML = `
+                <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-8 w-[400px] text-white font-sans rounded-3xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-10 -mt-10"></div>
+                    <div class="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full -ml-10 -mb-10"></div>
+                    
+                    <div class="relative z-10 text-center">
+                        <div class="inline-block bg-white/20 p-3 rounded-full mb-4 backdrop-blur-sm">
+                            <i class="fa-solid fa-calendar-star text-2xl text-white"></i>
+                        </div>
+                        <h1 class="text-3xl font-bold mb-1">${occasion}</h1>
+                        <p class="text-blue-100 text-sm mb-8">You're invited! Get ready for the event.</p>
+
+                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 mb-4 text-left border border-white/20">
+                            
+                            <!-- Contribution Display -->
+                            ${contributionDisplay}
+
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <span class="text-xs uppercase text-blue-200 font-bold tracking-wider">Date(s)</span>
+                                    ${dateInfoHtml}
+                                </div>
+                                <div>
+                                    <span class="text-xs uppercase text-blue-200 font-bold tracking-wider">Event Location</span>
+                                    <div class="text-xl font-black text-white leading-none">${loc}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 pt-4 border-t border-white/20">
+                                <div class="grid grid-cols-3 gap-3">
+                                    <div>
+                                        <span class="text-xs uppercase text-blue-200 font-bold tracking-wider block">Meetup</span>
+                                        <span class="text-sm font-bold text-white">${meetingPlace}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-xs uppercase text-blue-200 font-bold tracking-wider block">Call Time</span>
+                                        <div class="text-sm font-bold text-white leading-tight">${call}</div>
+                                    </div>
+                                    <div>
+                                        <span class="text-xs uppercase text-blue-200 font-bold tracking-wider block">Event Ends</span>
+                                        <div class="text-sm font-bold text-white leading-tight">${end}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-xs text-blue-200 mt-6">Generated by Eplann</div>
+                    </div>
+                </div>
+             `;
+             return container;
+        }
+
+        async function saveAsInvitationImage() {
+            const container = el('invitationContainer');
+            const contentToCapture = generateInvitationContent().firstElementChild;
+            if (!contentToCapture) return;
+            await captureAndDownloadImage(container, contentToCapture, 'Eplann_Invite');
+        }
+
+        // --- Common Image Capture Logic ---
+
+        async function captureAndDownloadImage(container, contentToCapture, prefix) {
+            // FIX: Simplified the capture logic and styling manipulation for reliability
+            
+            // 1. Temporarily position the container to be visible for capture, but transparent and non-interactive
+            container.style.position = 'fixed';
+            container.style.left = '0';
+            container.style.top = '0';
+            container.style.opacity = '0'; 
+            container.style.pointerEvents = 'none';
+            container.style.display = 'block';
+
+            try {
+                const canvas = await html2canvas(contentToCapture, { 
+                    scale: 2, 
+                    backgroundColor: null,
+                    useCORS: true
+                });
+                downloadImage(canvas, prefix);
+            } catch (error) {
+                console.error("Image Generation Error", error);
+                // Optionally display a user-friendly error message here instead of an alert
+            } finally {
+                // 3. Revert styles
+                container.style.position = 'absolute';
+                container.style.left = '-9999px';
+                container.style.top = '0';
+                container.style.opacity = '1'; 
+                container.style.pointerEvents = 'none';
+                container.style.display = 'none';
+            }
+        }
+
+        function downloadImage(canvas, prefix) {
+            const image = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.href = image;
+            const locName = el('location').value.trim() || 'Event';
+            link.download = `${prefix}_${locName.replace(/\s/g, '_')}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Init
+        loadData();
+        // Call this after loading data to apply the initial UI state for multi-day/single-day
+        updateShelterCostInputs(); 
+        renderMem();
+        renderBring();
+        switchTab(currentTab);
+        calc();
+        updateTotalBarUI(); // Apply initial state on load
+
+    </script>
+</body>
+</html>
